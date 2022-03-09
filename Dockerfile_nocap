@@ -1,0 +1,37 @@
+# Pull base image from authorized source
+FROM centos:7
+
+# Install necessary packages
+RUN yum install -y openldap openldap-clients openldap-servers openssl
+
+# Adjust installation for NOI
+RUN groupadd -g 2001 openldap &&\
+    useradd -u 1001 -g 2001 openldap && \
+    mkdir -p /home/openldap && \
+    mkdir -p /usr/local/var/openldap-data/slapd.d && \
+    mkdir -p /usr/local/var/run && \
+    rm -rf /etc/openldap/slapd.d
+
+# Copy files to container
+COPY ./imageFiles/sso.ldif /home/openldap/sso.ldif
+COPY ./imageFiles/slapd.conf.default /home/openldap/slapd.conf.default
+COPY ./imageFiles/start_server /home/openldap/start_server
+
+# Add permissions
+RUN chown -R openldap:openldap /home/openldap && \
+    chown -R openldap:openldap /usr/local/var/openldap-data && \
+    chown -R openldap:openldap /var/run/openldap && \
+    chmod 777 /home/openldap && \
+    chmod 777 -R /usr/local/var/openldap-data && \
+    chmod a+rw /usr/local/var/run && \    
+    chmod a+x /home/openldap/start_server && \
+    # setcap "cap_dac_override,cap_net_bind_service=+epi" /usr/sbin/slapd && \
+    ln -s /usr/bin/ldapsearch /usr/local/bin/ldapsearch
+
+USER 1001
+
+# EXPOSE 389 636
+
+# Entry point
+ENTRYPOINT ["/home/openldap/start_server"]
+
