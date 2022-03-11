@@ -30,7 +30,7 @@ It is recommended to switch to "proxy" mode by editing yaml of NOI instance:
 oc edit NOI/evtmanager -n waiops
 ```
 
-where `eventmanager` is a name of NOI instance and `waiops` is a namespace where it is installed. The mode should be changed from "standalone" to "proxy" as below (only "mode" matters, other parameters can be left as they're):
+where `evtmanager` is a name of NOI instance and `waiops` is a namespace where it is installed. The mode should be changed from "standalone" to "proxy" as below:
 
 ``` yaml
 ...
